@@ -1,24 +1,41 @@
 pipeline {
-    agent any 
+    agent any
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building...'
-                // Ajoute tes commandes de construction ici
+                git 'https://github.com/iptissem/infracraft.git'  // Remplace par l'URL de ton dépôt
             }
         }
-        stage('Test') {
+
+        stage('Terraform Init') {
             steps {
-                echo 'Testing...'
-                // Ajoute tes commandes de test ici
+                dir('terraform') {
+                    sh 'terraform init'
+                }
             }
         }
-        stage('Deploy') {
+
+        stage('Terraform Apply') {
             steps {
-                echo 'Deploying...'
-                // Ajoute tes commandes de déploiement ici
+                dir('terraform') {
+                    sh 'terraform apply -auto-approve'
+                }
             }
+        }
+
+        stage('Ansible Playbook') {
+            steps {
+                dir('ansible') {
+                    sh 'ansible-playbook -i inventory.ini playbook.yml'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Build finished.'
         }
     }
 }
