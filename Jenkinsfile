@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/iptissem/infracraft.git'
+               echo 'Code already checked out via SCM'
             }
         }
 
