@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/iptissem/infracraft.git'  // Remplace par l'URL de ton dépôt
+                git branch: 'main', url: 'https://github.com/iptissem/infracraft.git'
             }
         }
 
