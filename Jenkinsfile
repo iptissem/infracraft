@@ -12,19 +12,19 @@ pipeline {
             // Dépend des choix faits dans 'DOCKER_CHOICE'
             groovyScript {
                 script("""
-                    if (DOCKER_CHOICE == 'Serveur Web') {
+                    if (params.DOCKER_CHOICE == 'Serveur Web') {
                         return ['Nginx', 'Apache']
-                    } else if (DOCKER_CHOICE == 'Serveur de BD') {
+                    } else if (params.DOCKER_CHOICE == 'Serveur de BD') {
                         return ['MySQL', 'PostgreSQL', 'MongoDB']
-                    } else if (DOCKER_CHOICE == 'Serveur d\'Application') {
+                    } else if (params.DOCKER_CHOICE == 'Serveur d\'Application') {
                         return ['Node.js', 'Java (Spring Boot)', 'Python (Django/Flask)']
-                    } else if (DOCKER_CHOICE == 'Serveur de Cache') {
+                    } else if (params.DOCKER_CHOICE == 'Serveur de Cache') {
                         return ['Redis', 'Memcached']
-                    } else if (DOCKER_CHOICE == 'Serveur DNS') {
+                    } else if (params.DOCKER_CHOICE == 'Serveur DNS') {
                         return ['BIND', 'dnsmasq']
-                    } else if (DOCKER_CHOICE == 'Serveur de Monitoring') {
+                    } else if (params.DOCKER_CHOICE == 'Serveur de Monitoring') {
                         return ['Prometheus', 'Grafana']
-                    } else if (DOCKER_CHOICE == 'Contrôleur de Domaine') {
+                    } else if (params.DOCKER_CHOICE == 'Contrôleur de Domaine') {
                         return ['Active Directory']
                     } else {
                         return []
