@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-
     stages {
         stage('Sélection des services') {
             steps {
@@ -27,6 +26,19 @@ pipeline {
                 script {
                     echo "Simuler l'installation du service ${params.SERVICE_CHOICE} dans le conteneur Docker..."
                     echo "Service ${params.SERVICE_CHOICE} configuré avec succès dans le conteneur ${params.CONTAINER_NAME}."
+                }
+            }
+        }
+
+        stage('Exécution du Playbook Ansible') {
+            steps {
+                script {
+                    echo "Exécution du playbook Ansible pour déployer ${params.SERVICE_CHOICE}..."
+                    sh """
+                        ansible-playbook playbooks/web_server.yml \
+                        -e "webserver=${params.SERVICE_CHOICE}" \
+                        -i localhost,
+                    """
                 }
             }
         }
