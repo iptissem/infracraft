@@ -51,9 +51,14 @@ pipeline {
         stage('Création du conteneur Docker (Simulé)') {
             steps {
                 script {
-                    echo "Simuler la création du conteneur Docker: ${params.CONTAINER_NAME}..."
-                    echo "Service choisi: ${params.SERVICE_CHOICE}"
-                    echo "Simuler l'exécution de la commande 'docker run' pour ${params.SERVICE_CHOICE} dans ${params.CONTAINER_NAME}..."
+                    // Appel à Ansible pour déployer le service choisi
+                    echo "Démarrage du conteneur ${params.CONTAINER_NAME} avec le service ${params.SERVICE_CHOICE}..."
+                    sh """
+                        ansible-playbook playbooks/web_server.yml -i localhost, --extra-vars "server_choice=${params.SERVICE_CHOICE} container_name=${params.CONTAINER_NAME}"
+                    """
+                    // echo "Simuler la création du conteneur Docker: ${params.CONTAINER_NAME}..."
+                    // echo "Service choisi: ${params.SERVICE_CHOICE}"
+                    // echo "Simuler l'exécution de la commande 'docker run' pour ${params.SERVICE_CHOICE} dans ${params.CONTAINER_NAME}..."
                 }
             }
         }
