@@ -3,7 +3,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: web/Dockerfile  # Le Dockerfile pour nginx
+      dockerfile: web/Dockerfile.${WEB_IMAGE}  # Le Dockerfile pour nginx
     image: ${WEB_IMAGE}
     ports:
       - "80:80"
