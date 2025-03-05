@@ -35,15 +35,33 @@ pipeline {
 
                     // Affichez le service sélectionné
                     echo "Déploiement du service ${params.SERVICE_CHOICE} pour ${params.DOCKER_CHOICE}..."
-                    
-                    // Mettez à jour les variables d’environnement et créez un fichier .env avec le service sélectionné
-                    sh """
-                        echo "WEB_IMAGE=${serviceImage}" > .env
-                        echo "DB_IMAGE=${serviceImage}" >> .env
-                        echo "CACHE_IMAGE=${serviceImage}" >> .env
-                        echo "DNS_IMAGE=${serviceImage}" >> .env
-                        echo "MONITORING_IMAGE=${serviceImage}" >> .env
-                    """
+
+                    // Mettez à jour les variables d’environnement et créez un fichier .env
+                    if (params.DOCKER_CHOICE == 'web') {
+                        sh """
+                            echo "WEB_IMAGE=${serviceImage}" > .env
+                        """
+                    }
+                    else if (params.DOCKER_CHOICE == 'db') {
+                        sh """
+                            echo "DB_IMAGE=${serviceImage}" > .env
+                        """
+                    }
+                    else if (params.DOCKER_CHOICE == 'cache') {
+                        sh """
+                            echo "CACHE_IMAGE=${serviceImage}" > .env
+                        """
+                    }
+                    else if (params.DOCKER_CHOICE == 'dns') {
+                        sh """
+                            echo "DNS_IMAGE=${serviceImage}" > .env
+                        """
+                    }
+                    else if (params.DOCKER_CHOICE == 'monitoring') {
+                        sh """
+                            echo "MONITORING_IMAGE=${serviceImage}" > .env
+                        """
+                    }
 
                     echo "Fichier .env mis à jour avec ${serviceImage}"
                 }
@@ -55,7 +73,7 @@ pipeline {
                 script {
                     echo "Lancement de Docker Compose pour le service ${params.DOCKER_CHOICE}..."
                     
-                    // Modifiez le docker-compose.yml pour faire référence aux variables dans .env
+                    // Utiliser la commande docker-compose avec le fichier .env mis à jour
                     sh 'docker-compose -f docker-compose.yml up -d --build'
                 }
             }
