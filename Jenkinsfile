@@ -36,48 +36,35 @@ pipeline {
                     // Affichez le service sélectionné
                     echo "Déploiement du service ${params.SERVICE_CHOICE} pour ${params.DOCKER_CHOICE}..."
                     
-                    // Mettre à jour uniquement la variable nécessaire dans le fichier .env
+                    // Mettez à jour le fichier .env en fonction du service sélectionné
+                    def envVars = [
+                        'WEB_IMAGE': '',
+                        'DB_IMAGE': '',
+                        'CACHE_IMAGE': '',
+                        'DNS_IMAGE': '',
+                        'MONITORING_IMAGE': ''
+                    ]
+                    
                     if (params.DOCKER_CHOICE == 'web') {
-                        sh """
-                            echo "WEB_IMAGE=${serviceImage}" > .env
-                            echo "DB_IMAGE=" >> .env
-                            echo "CACHE_IMAGE=" >> .env
-                            echo "DNS_IMAGE=" >> .env
-                            echo "MONITORING_IMAGE=" >> .env
-                        """
+                        envVars.WEB_IMAGE = serviceImage
                     } else if (params.DOCKER_CHOICE == 'db') {
-                        sh """
-                            echo "WEB_IMAGE=" > .env
-                            echo "DB_IMAGE=${serviceImage}" >> .env
-                            echo "CACHE_IMAGE=" >> .env
-                            echo "DNS_IMAGE=" >> .env
-                            echo "MONITORING_IMAGE=" >> .env
-                        """
+                        envVars.DB_IMAGE = serviceImage
                     } else if (params.DOCKER_CHOICE == 'cache') {
-                        sh """
-                            echo "WEB_IMAGE=" > .env
-                            echo "DB_IMAGE=" >> .env
-                            echo "CACHE_IMAGE=${serviceImage}" >> .env
-                            echo "DNS_IMAGE=" >> .env
-                            echo "MONITORING_IMAGE=" >> .env
-                        """
+                        envVars.CACHE_IMAGE = serviceImage
                     } else if (params.DOCKER_CHOICE == 'dns') {
-                        sh """
-                            echo "WEB_IMAGE=" > .env
-                            echo "DB_IMAGE=" >> .env
-                            echo "CACHE_IMAGE=" >> .env
-                            echo "DNS_IMAGE=${serviceImage}" >> .env
-                            echo "MONITORING_IMAGE=" >> .env
-                        """
+                        envVars.DNS_IMAGE = serviceImage
                     } else if (params.DOCKER_CHOICE == 'monitoring') {
-                        sh """
-                            echo "WEB_IMAGE=" > .env
-                            echo "DB_IMAGE=" >> .env
-                            echo "CACHE_IMAGE=" >> .env
-                            echo "DNS_IMAGE=" >> .env
-                            echo "MONITORING_IMAGE=${serviceImage}" >> .env
-                        """
+                        envVars.MONITORING_IMAGE = serviceImage
                     }
+
+                    // Crée le fichier .env avec les bonnes variables
+                    sh """
+                        echo "WEB_IMAGE=${envVars.WEB_IMAGE}" > .env
+                        echo "DB_IMAGE=${envVars.DB_IMAGE}" >> .env
+                        echo "CACHE_IMAGE=${envVars.CACHE_IMAGE}" >> .env
+                        echo "DNS_IMAGE=${envVars.DNS_IMAGE}" >> .env
+                        echo "MONITORING_IMAGE=${envVars.MONITORING_IMAGE}" >> .env
+                    """
 
                     echo "Fichier .env mis à jour avec ${serviceImage}"
                 }
