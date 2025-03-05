@@ -1,0 +1,11 @@
+# Utiliser l'image de base Apache
+FROM httpd:latest
+
+# Copier les fichiers de l'application dans le répertoire d'Apache
+COPY ./html /usr/local/apache2/htdocs/  
+
+# Exposer le port 80
+EXPOSE 80
+
+# Lancer Apache
+CMD ["httpd-foreground"]

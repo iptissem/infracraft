@@ -1,0 +1,18 @@
+# Utilisation de l'image Node.js
+FROM node:latest
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier le package.json et installer les dépendances
+COPY package.json .
+RUN npm install
+
+# Copier le reste de l'application
+COPY . .
+
+# Exposer le port de l'application
+EXPOSE 3000
+
+# Lancer l'application
+CMD ["npm", "start"]

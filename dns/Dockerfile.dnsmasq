@@ -1,0 +1,12 @@
+# Utilisation de l'image officielle dnsmasq
+FROM andyshinn/dnsmasq:latest
+
+# Exposer le port 53 pour les requêtes DNS
+EXPOSE 53/udp
+EXPOSE 53/tcp
+
+# Ajouter la configuration dnsmasq si nécessaire
+# COPY dnsmasq.conf /etc/dnsmasq.conf
+
+# Démarrer le serveur dnsmasq
+CMD ["dnsmasq", "-k"]

@@ -1,0 +1,4 @@
+FROM prom/prometheus:latest
+
+# Exposer le port par défaut de Prometheus
+EXPOSE 9090

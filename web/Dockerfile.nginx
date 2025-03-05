@@ -1,0 +1,11 @@
+# Utiliser l'image de base Nginx
+FROM nginx:latest
+
+# Copier les fichiers de l'application dans le répertoire de Nginx
+COPY ./html /usr/share/nginx/html 
+
+# Exposer le port 80
+EXPOSE 80
+
+# Lancer Nginx
+CMD ["nginx", "-g", "daemon off;"]

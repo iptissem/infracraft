@@ -1,0 +1,62 @@
+version: '3'
+services:
+  # Serveur Web
+  web:
+    build:
+      context: ./web
+      dockerfile: "Dockerfile.${WEB_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `WEB_IMAGE`
+    container_name: web_app
+    image: ${WEB_IMAGE}:latest  # Utilise la variable `WEB_IMAGE` pour l'image du service web
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+  # Serveur de Base de Données
+  db:
+    build:
+      context: ./db
+      dockerfile: "Dockerfile.${DB_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `DB_IMAGE`
+    container_name: db_server
+    image: ${DB_IMAGE}:latest  # Utilise la variable `DB_IMAGE` pour l'image de la base de données
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  # Serveur Cache
+  cache:
+    build:
+      context: ./cache
+      dockerfile: "Dockerfile.${CACHE_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `CACHE_IMAGE`
+    container_name: cache_server
+    image: ${CACHE_IMAGE}:latest  # Utilise la variable `CACHE_IMAGE` pour l'image du service cache
+    networks:
+      - app-network
+
+  # Serveur DNS
+  dns:
+    build:
+      context: ./dns
+      dockerfile: "Dockerfile.${DNS_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `DNS_IMAGE`
+    container_name: dns_server
+    image: ${DNS_IMAGE}:latest  # Utilise la variable `DNS_IMAGE` pour l'image du service DNS
+    networks:
+      - app-network
+
+  # Serveur de Monitoring
+  monitoring:
+    build:
+      context: ./monitoring
+      dockerfile: "Dockerfile.${MONITORING_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `MONITORING_IMAGE`
+    container_name: monitoring_server
+    image: ${MONITORING_IMAGE}:latest  # Utilise la variable `MONITORING_IMAGE` pour l'image du service monitoring
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,8 @@
+FROM mysql:latest
+
+# Environnement par défaut pour MySQL
+ENV MYSQL_ROOT_PASSWORD=rootpassword
+ENV MYSQL_DATABASE=my_database
+
+# Exposer le port 3306 pour MySQL
+EXPOSE 3306

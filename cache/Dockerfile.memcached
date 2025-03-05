@@ -1,0 +1,4 @@
+FROM memcached:latest
+
+# Exposer le port par défaut de Memcached
+EXPOSE 11211

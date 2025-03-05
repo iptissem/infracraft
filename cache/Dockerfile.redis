@@ -1,0 +1,4 @@
+FROM redis:latest
+
+# Exposer le port par défaut de Redis
+EXPOSE 6379

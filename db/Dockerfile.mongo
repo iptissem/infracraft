@@ -1,0 +1,8 @@
+# Utilisation de l'image officielle MongoDB
+FROM mongo:latest
+
+# Exposer le port 27017 pour MongoDB
+EXPOSE 27017
+
+# Par défaut, MongoDB utilise un volume pour la persistance des données.
+# Ce volume sera automatiquement mappé lors de l'exécution des containers via Docker Compose ou lors de la création de l'image.

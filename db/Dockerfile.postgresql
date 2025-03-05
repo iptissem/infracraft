@@ -1,0 +1,8 @@
+FROM postgres:latest
+
+# Environnement par défaut pour PostgreSQL
+ENV POSTGRES_PASSWORD=rootpassword
+ENV POSTGRES_DB=my_database
+
+# Exposer le port 5432 pour PostgreSQL
+EXPOSE 5432

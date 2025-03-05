@@ -1,0 +1,4 @@
+FROM grafana/grafana:latest
+
+# Exposer le port par défaut de Grafana
+EXPOSE 3000
