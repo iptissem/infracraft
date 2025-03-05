@@ -35,10 +35,6 @@ pipeline {
                     // Met à jour les variables d’environnement
                     sh """
                         echo "WEB_IMAGE=${serviceImage}" > .env
-                        echo "DB_IMAGE=${serviceImage}" >> .env
-                        echo "CACHE_IMAGE=${serviceImage}" >> .env
-                        echo "DNS_IMAGE=${serviceImage}" >> .env
-                        echo "MONITORING_IMAGE=${serviceImage}" >> .env
                     """
 
                     echo "Fichier .env mis à jour avec ${serviceImage}"
