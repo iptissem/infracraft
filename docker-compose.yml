@@ -3,7 +3,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: web/Dockerfile.${WEB_IMAGE}  # Le Dockerfile pour nginx
+      dockerfile: web/Dockerfile.${WEB_IMAGE} 
     image: ${WEB_IMAGE}
     ports:
       - "80:80"
@@ -11,10 +11,10 @@ services:
   # Serveur de Base de Données
   db:
     build:
-      context: ./db
-      dockerfile: "Dockerfile.${DB_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `DB_IMAGE`
+      context: .
+      dockerfile: db/Dockerfile.${DB_IMAGE} 
     container_name: db_server
-    image: ${DB_IMAGE}:latest  # Utilise la variable `DB_IMAGE` pour l'image de la base de données
+    image: ${DB_IMAGE}:latest
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -27,9 +27,9 @@ services:
   cache:
     build:
       context: ./cache
-      dockerfile: "Dockerfile.${CACHE_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `CACHE_IMAGE`
+      dockerfile: "Dockerfile.${CACHE_IMAGE}"
     container_name: cache_server
-    image: ${CACHE_IMAGE}:latest  # Utilise la variable `CACHE_IMAGE` pour l'image du service cache
+    image: ${CACHE_IMAGE}:latest 
     networks:
       - app-network
 
