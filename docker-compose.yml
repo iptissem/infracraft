@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: web/Dockerfile.${WEB_IMAGE} 
-    image: ${WEB_IMAGE}
+    image: ${WEB_IMAGE}:latest 
     ports:
       - "80:80"
 
@@ -17,7 +17,7 @@ services:
     image: ${DB_IMAGE}:latest
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_DATABASE: ${DB_DATABASE}:latest 
     ports:
       - "3306:3306"
     networks:
@@ -37,9 +37,9 @@ services:
   dns:
     build:
       context: ./dns
-      dockerfile: "Dockerfile.${DNS_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `DNS_IMAGE`
+      dockerfile: "Dockerfile.${DNS_IMAGE}"  
     container_name: dns_server
-    image: ${DNS_IMAGE}:latest  # Utilise la variable `DNS_IMAGE` pour l'image du service DNS
+    image: ${DNS_IMAGE}:latest  
     networks:
       - app-network
 
@@ -47,9 +47,9 @@ services:
   monitoring:
     build:
       context: ./monitoring
-      dockerfile: "Dockerfile.${MONITORING_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `MONITORING_IMAGE`
+      dockerfile: "Dockerfile.${MONITORING_IMAGE}" 
     container_name: monitoring_server
-    image: ${MONITORING_IMAGE}:latest  # Utilise la variable `MONITORING_IMAGE` pour l'image du service monitoring
+    image: ${MONITORING_IMAGE}:latest  
     networks:
       - app-network
 
