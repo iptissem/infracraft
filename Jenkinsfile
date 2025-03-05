@@ -11,6 +11,7 @@ pipeline {
         stage('Configuration des Variables') {
             steps {
                 script {
+                    // Mapping des services à leurs images Docker
                     def dockerfileMap = [
                         'Nginx': 'nginx',
                         'Apache': 'apache',
@@ -24,17 +25,24 @@ pipeline {
                         'Grafana': 'grafana'
                     ]
                     
+                    // Obtenez l'image correspondant au service choisi
                     def serviceImage = dockerfileMap[params.SERVICE_CHOICE]
                     
+                    // Vérification si l'image est valide
                     if (!serviceImage) {
                         error "Service non reconnu : ${params.SERVICE_CHOICE}"
                     }
 
+                    // Affichez le service sélectionné
                     echo "Déploiement du service ${params.SERVICE_CHOICE} pour ${params.DOCKER_CHOICE}..."
                     
-                    // Met à jour les variables d’environnement
+                    // Mettez à jour les variables d’environnement et créez un fichier .env avec le service sélectionné
                     sh """
                         echo "WEB_IMAGE=${serviceImage}" > .env
+                        echo "DB_IMAGE=${serviceImage}" >> .env
+                        echo "CACHE_IMAGE=${serviceImage}" >> .env
+                        echo "DNS_IMAGE=${serviceImage}" >> .env
+                        echo "MONITORING_IMAGE=${serviceImage}" >> .env
                     """
 
                     echo "Fichier .env mis à jour avec ${serviceImage}"
@@ -45,8 +53,10 @@ pipeline {
         stage('Déploiement avec Docker Compose') {
             steps {
                 script {
-                    echo "Lancement de Docker Compose..."
-                    sh 'docker-compose up -d --build'
+                    echo "Lancement de Docker Compose pour le service ${params.DOCKER_CHOICE}..."
+                    
+                    // Modifiez le docker-compose.yml pour faire référence aux variables dans .env
+                    sh 'docker-compose -f docker-compose.yml up -d --build'
                 }
             }
         }
