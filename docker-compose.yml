@@ -4,24 +4,24 @@ services:
     build:
       context: .
       dockerfile: web/Dockerfile.${WEB_IMAGE} 
-    image: ${WEB_IMAGE}:latest 
+    image: ${WEB_IMAGE}
     ports:
       - "80:80"
 
-  # Serveur de Base de Données
-  db:
-    build:
-      context: .
-      dockerfile: db/Dockerfile.${DB_IMAGE} 
-    container_name: db_server
-    image: ${DB_IMAGE}:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}:latest 
-    ports:
-      - "3306:3306"
-    networks:
-      - app-network
+  # # Serveur de Base de Données
+  # db:
+  #   build:
+  #     context: .
+  #     dockerfile: db/Dockerfile.${DB_IMAGE} 
+  #   container_name: db_server
+  #   image: ${DB_IMAGE}:latest
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+  #     MYSQL_DATABASE: ${DB_DATABASE}:latest 
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - app-network
 
   # Serveur Cache
   cache:
