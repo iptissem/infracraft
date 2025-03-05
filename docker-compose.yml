@@ -24,34 +24,34 @@ services:
   #     - app-network
 
   # Serveur Cache
-  cache:
-    build:
-      context: ./cache
-      dockerfile: "Dockerfile.${CACHE_IMAGE}"
-    container_name: cache_server
-    image: ${CACHE_IMAGE}:latest 
-    networks:
-      - app-network
+  # cache:
+  #   build:
+  #     context: ./cache
+  #     dockerfile: "Dockerfile.${CACHE_IMAGE}"
+  #   container_name: cache_server
+  #   image: ${CACHE_IMAGE}:latest 
+  #   networks:
+  #     - app-network
 
-  # Serveur DNS
-  dns:
-    build:
-      context: ./dns
-      dockerfile: "Dockerfile.${DNS_IMAGE}"  
-    container_name: dns_server
-    image: ${DNS_IMAGE}:latest  
-    networks:
-      - app-network
+  # # Serveur DNS
+  # dns:
+  #   build:
+  #     context: ./dns
+  #     dockerfile: "Dockerfile.${DNS_IMAGE}"  
+  #   container_name: dns_server
+  #   image: ${DNS_IMAGE}:latest  
+  #   networks:
+  #     - app-network
 
-  # Serveur de Monitoring
-  monitoring:
-    build:
-      context: ./monitoring
-      dockerfile: "Dockerfile.${MONITORING_IMAGE}" 
-    container_name: monitoring_server
-    image: ${MONITORING_IMAGE}:latest  
-    networks:
-      - app-network
+  # # Serveur de Monitoring
+  # monitoring:
+  #   build:
+  #     context: ./monitoring
+  #     dockerfile: "Dockerfile.${MONITORING_IMAGE}" 
+  #   container_name: monitoring_server
+  #   image: ${MONITORING_IMAGE}:latest  
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
