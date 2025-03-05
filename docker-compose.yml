@@ -1,16 +1,12 @@
 version: '3'
 services:
-  # Serveur Web
   web:
     build:
-      context: ./web
-      dockerfile: "Dockerfile.${WEB_IMAGE}"  # Utilise le Dockerfile sélectionné basé sur la variable `WEB_IMAGE`
-    container_name: web_app
-    image: ${WEB_IMAGE}:latest  # Utilise la variable `WEB_IMAGE` pour l'image du service web
+      context: .
+      dockerfile: web/Dockerfile  # Le Dockerfile pour nginx
+    image: ${WEB_IMAGE}
     ports:
       - "80:80"
-    networks:
-      - app-network
 
   # Serveur de Base de Données
   db:
