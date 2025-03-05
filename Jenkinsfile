@@ -43,6 +43,8 @@ pipeline {
                         """
                     }
                     else if (params.DOCKER_CHOICE == 'db') {
+                        // Si tu choisis db, ne pas mettre à jour WEB_IMAGE
+                        echo "Ne pas modifier WEB_IMAGE si service choisi est db"
                         sh """
                             echo "DB_IMAGE=${serviceImage}" > .env
                         """
