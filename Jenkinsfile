@@ -35,33 +35,47 @@ pipeline {
 
                     // Affichez le service sélectionné
                     echo "Déploiement du service ${params.SERVICE_CHOICE} pour ${params.DOCKER_CHOICE}..."
-
-                    // Mettez à jour les variables d’environnement et créez un fichier .env
+                    
+                    // Mettre à jour uniquement la variable nécessaire dans le fichier .env
                     if (params.DOCKER_CHOICE == 'web') {
                         sh """
                             echo "WEB_IMAGE=${serviceImage}" > .env
+                            echo "DB_IMAGE=" >> .env
+                            echo "CACHE_IMAGE=" >> .env
+                            echo "DNS_IMAGE=" >> .env
+                            echo "MONITORING_IMAGE=" >> .env
                         """
-                    }
-                    else if (params.DOCKER_CHOICE == 'db') {
-                        // Si tu choisis db, ne pas mettre à jour WEB_IMAGE
-                        echo "Ne pas modifier WEB_IMAGE si service choisi est db"
+                    } else if (params.DOCKER_CHOICE == 'db') {
                         sh """
-                            echo "DB_IMAGE=${serviceImage}" > .env
+                            echo "WEB_IMAGE=" > .env
+                            echo "DB_IMAGE=${serviceImage}" >> .env
+                            echo "CACHE_IMAGE=" >> .env
+                            echo "DNS_IMAGE=" >> .env
+                            echo "MONITORING_IMAGE=" >> .env
                         """
-                    }
-                    else if (params.DOCKER_CHOICE == 'cache') {
+                    } else if (params.DOCKER_CHOICE == 'cache') {
                         sh """
-                            echo "CACHE_IMAGE=${serviceImage}" > .env
+                            echo "WEB_IMAGE=" > .env
+                            echo "DB_IMAGE=" >> .env
+                            echo "CACHE_IMAGE=${serviceImage}" >> .env
+                            echo "DNS_IMAGE=" >> .env
+                            echo "MONITORING_IMAGE=" >> .env
                         """
-                    }
-                    else if (params.DOCKER_CHOICE == 'dns') {
+                    } else if (params.DOCKER_CHOICE == 'dns') {
                         sh """
-                            echo "DNS_IMAGE=${serviceImage}" > .env
+                            echo "WEB_IMAGE=" > .env
+                            echo "DB_IMAGE=" >> .env
+                            echo "CACHE_IMAGE=" >> .env
+                            echo "DNS_IMAGE=${serviceImage}" >> .env
+                            echo "MONITORING_IMAGE=" >> .env
                         """
-                    }
-                    else if (params.DOCKER_CHOICE == 'monitoring') {
+                    } else if (params.DOCKER_CHOICE == 'monitoring') {
                         sh """
-                            echo "MONITORING_IMAGE=${serviceImage}" > .env
+                            echo "WEB_IMAGE=" > .env
+                            echo "DB_IMAGE=" >> .env
+                            echo "CACHE_IMAGE=" >> .env
+                            echo "DNS_IMAGE=" >> .env
+                            echo "MONITORING_IMAGE=${serviceImage}" >> .env
                         """
                     }
 
