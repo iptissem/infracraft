@@ -23,7 +23,7 @@ services:
     networks:
       - app-network
 
-  Serveur Cache
+ # Serveur Cache
   cache:
     build:
       context: ./cache
