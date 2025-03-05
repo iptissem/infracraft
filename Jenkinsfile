@@ -36,28 +36,47 @@ pipeline {
                     // Affichez le service sélectionné
                     echo "Déploiement du service ${params.SERVICE_CHOICE} pour ${params.DOCKER_CHOICE}..."
                     
-                    // Mettez à jour le fichier .env en fonction du service sélectionné
-                    def envVars = [
-                        'WEB_IMAGE': '',
-                        'DB_IMAGE': '',
-                        'CACHE_IMAGE': '',
-                        'DNS_IMAGE': '',
-                        'MONITORING_IMAGE': ''
-                    ]
-                    
-                    if (params.DOCKER_CHOICE == 'web') {
-                        envVars.WEB_IMAGE = serviceImage
-                    } else if (params.DOCKER_CHOICE == 'db') {
-                        envVars.DB_IMAGE = serviceImage
-                    } else if (params.DOCKER_CHOICE == 'cache') {
-                        envVars.CACHE_IMAGE = serviceImage
-                    } else if (params.DOCKER_CHOICE == 'dns') {
-                        envVars.DNS_IMAGE = serviceImage
-                    } else if (params.DOCKER_CHOICE == 'monitoring') {
-                        envVars.MONITORING_IMAGE = serviceImage
+                    // Crée un fichier docker-compose.yml dynamique
+                    def dockerComposeContent = """
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile.${serviceImage}
+    image: ${serviceImage}
+    ports:
+      - "80:80"
+"""
+
+                    // Ajouter conditionnellement les autres services selon le choix
+                    if (params.DOCKER_CHOICE == 'db') {
+                        dockerComposeContent += """
+  db:
+    build:
+      context: .
+      dockerfile: db/Dockerfile.${serviceImage}
+    container_name: db_server
+    image: ${serviceImage}:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+"""
                     }
 
-                    echo "Fichier .env mis à jour avec ${serviceImage}"
+                    // Générer le fichier docker-compose.yml
+                    writeFile file: 'docker-compose.yml', text: dockerComposeContent
+
+                    // Mettre à jour .env avec bash pour éviter "Bad substitution"
+                    sh 'bash -c "echo WEB_IMAGE=${serviceImage} > .env"'
+                    sh 'bash -c "echo DB_IMAGE=${serviceImage} >> .env"'
+                    sh 'bash -c "echo CACHE_IMAGE=${serviceImage} >> .env"'
+                    sh 'bash -c "echo DNS_IMAGE=${serviceImage} >> .env"'
+                    sh 'bash -c "echo MONITORING_IMAGE=${serviceImage} >> .env"'
                 }
             }
         }
@@ -66,8 +85,8 @@ pipeline {
             steps {
                 script {
                     echo "Lancement de Docker Compose pour le service ${params.DOCKER_CHOICE}..."
-                    
-                    sh 'docker-compose -f docker-compose.yml up -d --build --no-deps ${params.DOCKER_CHOICE}'
+                    // Exécute Docker Compose avec le fichier généré dynamiquement
+                    sh 'docker-compose -f docker-compose.yml up -d --build'
                 }
             }
         }
