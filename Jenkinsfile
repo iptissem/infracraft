@@ -57,15 +57,6 @@ pipeline {
                         envVars.MONITORING_IMAGE = serviceImage
                     }
 
-                    // Crée le fichier .env avec les bonnes variables
-                    sh """
-                        echo "WEB_IMAGE=${envVars.WEB_IMAGE}" > .env
-                        echo "DB_IMAGE=${envVars.DB_IMAGE}" >> .env
-                        echo "CACHE_IMAGE=${envVars.CACHE_IMAGE}" >> .env
-                        echo "DNS_IMAGE=${envVars.DNS_IMAGE}" >> .env
-                        echo "MONITORING_IMAGE=${envVars.MONITORING_IMAGE}" >> .env
-                    """
-
                     echo "Fichier .env mis à jour avec ${serviceImage}"
                 }
             }
@@ -76,8 +67,7 @@ pipeline {
                 script {
                     echo "Lancement de Docker Compose pour le service ${params.DOCKER_CHOICE}..."
                     
-                    // Utiliser la commande docker-compose avec le fichier .env mis à jour
-                    sh 'docker-compose -f docker-compose.yml up -d --build'
+                    sh 'docker-compose -f docker-compose.yml up -d --build --no-deps ${params.DOCKER_CHOICE}'
                 }
             }
         }
