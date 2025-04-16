@@ -2,90 +2,115 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'DOCKER_CHOICE', choices: ['web', 'db', 'cache', 'dns', 'monitoring'], description: 'Sélectionnez le type de service')
-        choice(name: 'SERVICE_CHOICE', choices: ['Nginx', 'Apache', 'MySQL', 'PostgreSQL', 'Redis', 'Memcached', 'BIND', 'dnsmasq', 'Prometheus', 'Grafana'], description: 'Choisissez le service spécifique')
-        string(name: 'CONTAINER_NAME', defaultValue: 'my-container', description: 'Nom du conteneur Docker')
+        booleanParam(name: 'ENABLE_WEB', defaultValue: true, description: 'Déployer un service Web')
+        choice(name: 'WEB_SERVICE', choices: ['Nginx', 'Apache'], description: 'Choix du service Web')
+
+        booleanParam(name: 'ENABLE_DB', defaultValue: false, description: 'Déployer une base de données')
+        choice(name: 'DB_SERVICE', choices: ['MySQL', 'PostgreSQL'], description: 'Choix du service BDD')
+
+        booleanParam(name: 'ENABLE_CACHE', defaultValue: false, description: 'Déployer un cache')
+        choice(name: 'CACHE_SERVICE', choices: ['Redis', 'Memcached'], description: 'Choix du cache')
+
+        booleanParam(name: 'ENABLE_DNS', defaultValue: false, description: 'Déployer un service DNS')
+        choice(name: 'DNS_SERVICE', choices: ['BIND', 'dnsmasq'], description: 'Choix du service DNS')
+
+        booleanParam(name: 'ENABLE_MONITORING', defaultValue: false, description: 'Déployer un service de monitoring')
+        choice(name: 'MONITORING_SERVICE', choices: ['Prometheus', 'Grafana'], description: 'Choix du monitoring')
     }
 
     stages {
-        stage('Configuration des Variables') {
+        stage('Génération du docker-compose.yml') {
             steps {
                 script {
-                    // Mapping des services à leurs images Docker
                     def dockerfileMap = [
-                        'Nginx': 'nginx',
-                        'Apache': 'apache',
-                        'MySQL': 'mysql',
-                        'PostgreSQL': 'postgresql',
-                        'Redis': 'redis',
-                        'Memcached': 'memcached',
-                        'BIND': 'bind',
-                        'dnsmasq': 'dnsmasq',
-                        'Prometheus': 'prometheus',
-                        'Grafana': 'grafana'
+                        'Nginx'      : 'nginx',
+                        'Apache'     : 'httpd',
+                        'MySQL'      : 'mysql',
+                        'PostgreSQL' : 'postgres',
+                        'Redis'      : 'redis',
+                        'Memcached'  : 'memcached',
+                        'BIND'       : 'internetsystemsconsortium/bind9:9.16',
+                        'dnsmasq'    : 'jpillora/dnsmasq',
+                        'Prometheus' : 'prom/prometheus',
+                        'Grafana'    : 'grafana/grafana'
                     ]
-                    
-                    // Obtenez l'image correspondant au service choisi
-                    def serviceImage = dockerfileMap[params.SERVICE_CHOICE]
-                    
-                    // Vérification si l'image est valide
-                    if (!serviceImage) {
-                        error "Service non reconnu : ${params.SERVICE_CHOICE}"
-                    }
 
-                    // Affichez le service sélectionné
-                    echo "Déploiement du service ${params.SERVICE_CHOICE} pour ${params.DOCKER_CHOICE}..."
-                    
-                    // Crée un fichier docker-compose.yml dynamique
                     def dockerComposeContent = """
 version: '3'
 services:
+"""
+
+                    if (params.ENABLE_WEB) {
+                        def image = dockerfileMap[params.WEB_SERVICE]
+                        dockerComposeContent += """
   web:
-    build:
-      context: .
-      dockerfile: web/Dockerfile.${serviceImage}
-    image: ${serviceImage}
+    image: ${image}
+    container_name: web_service
     ports:
       - "80:80"
 """
+                    }
 
-                    // Ajouter conditionnellement les autres services selon le choix
-                    if (params.DOCKER_CHOICE == 'db') {
+                    if (params.ENABLE_DB) {
+                        def image = dockerfileMap[params.DB_SERVICE]
                         dockerComposeContent += """
   db:
-    build:
-      context: .
-      dockerfile: db/Dockerfile.${serviceImage}
-    container_name: db_server
-    image: ${serviceImage}:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
+    image: ${image}
+    container_name: db_service
     ports:
       - "3306:3306"
-    networks:
-      - app-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
 """
                     }
 
-                    // Générer le fichier docker-compose.yml
+                    if (params.ENABLE_CACHE) {
+                        def image = dockerfileMap[params.CACHE_SERVICE]
+                        dockerComposeContent += """
+  cache:
+    image: ${image}
+    container_name: cache_service
+    ports:
+      - "6379:6379"
+"""
+                    }
+
+                    if (params.ENABLE_DNS) {
+                        def image = dockerfileMap[params.DNS_SERVICE]
+                        dockerComposeContent += """
+  dns:
+    image: ${image}
+    container_name: dns_service
+    ports:
+      - "53:53/udp"
+"""
+                    }
+
+                    if (params.ENABLE_MONITORING) {
+                        def image = dockerfileMap[params.MONITORING_SERVICE]
+                        def port = (params.MONITORING_SERVICE == 'Prometheus') ? '9090' : '3000'
+                        dockerComposeContent += """
+  monitoring:
+    image: ${image}
+    container_name: monitoring_service
+    ports:
+      - "${port}:${port}"
+"""
+                    }
+
+                    // Écrire le fichier docker-compose.yml
                     writeFile file: 'docker-compose.yml', text: dockerComposeContent
 
-                    // Mettre à jour .env avec bash pour éviter "Bad substitution"
-                    sh 'bash -c "echo WEB_IMAGE=${serviceImage} > .env"'
-                    sh 'bash -c "echo DB_IMAGE=${serviceImage} >> .env"'
-                    sh 'bash -c "echo CACHE_IMAGE=${serviceImage} >> .env"'
-                    sh 'bash -c "echo DNS_IMAGE=${serviceImage} >> .env"'
-                    sh 'bash -c "echo MONITORING_IMAGE=${serviceImage} >> .env"'
+                    // Afficher le contenu pour debug
+                    echo "Contenu de docker-compose.yml :\n${dockerComposeContent}"
                 }
             }
         }
 
-        stage('Déploiement avec Docker Compose') {
+        stage('Déploiement Docker') {
             steps {
                 script {
-                    echo "Lancement de Docker Compose pour le service ${params.DOCKER_CHOICE}..."
-                    // Exécute Docker Compose avec le fichier généré dynamiquement
+                    echo "Déploiement des services sélectionnés..."
                     sh 'docker-compose -f docker-compose.yml up -d --build'
                 }
             }
