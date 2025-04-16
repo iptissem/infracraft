@@ -1,13 +1,12 @@
-# Utilisation de l'image officielle BIND
+# Utiliser l'image officielle BIND de Docker Hub
 FROM internetsystemsconsortium/bind9:latest
 
-# Exposer le port 53 pour les requêtes DNS
+# Exposer le port 53 pour les requêtes DNS (UDP et TCP)
 EXPOSE 53/udp
 EXPOSE 53/tcp
 
-# Ajouter la configuration BIND si nécessaire
 # COPY named.conf /etc/bind/named.conf
 # COPY db.example.com /etc/bind/db.example.com
 
-# Démarrer le serveur BIND
+# Démarrer le serveur BIND en mode premier plan (avec l'option -g pour afficher les logs)
 CMD ["named", "-g"]
